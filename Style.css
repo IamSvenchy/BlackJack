@@ -1,3 +1,10 @@
+.doc{
+    position: absolute;
+    background-color: bisque;
+    height: 100%;
+    width: 100%;
+}
+
 .left-container{
     height: 500px;
     width: 282px;
@@ -57,22 +64,31 @@
 
 #hit{
     position: absolute;
-    left: 30%;
+    left: 21.5%;
     bottom: 5%;
+    width: 100px;
+    height: 50px;
 }
 
 #stay{
     position: absolute;
-    left: 40%;
+    left: 36.5%;
     bottom: 5%;
+    width: 100px;
+    height: 50px;
 }
 #split{
     position: absolute;
-    left: 50%;
+    left: 51.5%;
     bottom: 5%;
+    width: 100px;
+    height: 50px;
 }
 #dd{
     position: absolute;
-    left: 60%;
+    left: 66.5%;
     bottom: 5%;
+    width: 100px;
+    height: 50px;
+    padding: 0px;
 }
