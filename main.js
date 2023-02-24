@@ -89,7 +89,7 @@ for(let i = 0; i < suits.length; i++){
 
 const divWinLose = document.createElement('div')
 divWinLose.setAttribute("id", "win")
-divWinLose.setAttribute("style", "position: absolute; width:300px; height: 100px; left:" + 32 + "%; bottom: " + 78 + "%;")
+divWinLose.setAttribute("style", "position: absolute; width:240px; height: 80px; left:" + 35 + "%; bottom: " + 82 + "%;")
 middle.appendChild(divWinLose)
 
 
@@ -120,6 +120,11 @@ function replay(){
     playerPosY = playerPosStartY
     dealerPosX = PosStartX
     dealerPosY = DealerPosStartY
+
+    document.querySelector(".player-score").textContent = ""
+    document.querySelector(".dealer-score").textContent = ""
+
+
     
 
     document.querySelectorAll("#card").forEach((element) => {
@@ -159,6 +164,8 @@ function deal(){
     console.log(curCards.length + " ->" + dealerHand + " " + playerHand)
     console.log(playerVal + " " + dealerVal)
 
+    document.querySelector(".player-score").textContent = playerVal
+
     if(playerVal == 21 && dealerVal == 21){
         playerWin = true
         dealerWin = true
@@ -186,6 +193,10 @@ function deal(){
 //hit
 function hit(){
     addCardPlayer()
+    document.querySelector(".player-score").textContent = playerVal
+
+    console.log("player val hit " + playerVal)
+
 
     if(playerWin){
         let winSign = document.createElement("img")
@@ -211,6 +222,8 @@ function rmvHidden(){
 //stay
 function stay(){
     rmvHidden()
+    document.querySelector(".dealer-score").textContent = dealerVal
+    
 
     hitBtn.disabled = true
     splitBtn.disabled = true
@@ -221,7 +234,9 @@ function stay(){
         
         setTimeout(() => {
             addCardDealer()
-            stay()}, 1000)
+            stay()
+            document.querySelector(".dealer-score").textContent = dealerVal
+        }, 1000)
     }else if(dealerVal > 21){
         playerWins()
         console.log("player " + playerVal + " " + "dealer " + dealerVal)
@@ -291,16 +306,26 @@ function addCardPlayer(){
 
     playerHand.push(curCards[random])
 
-    if(curCards[random].value == 0){
-        if(playerWin + 11 > 21){
-            playerVal++;
-        }else{
-            playerVal += 11;
+    playerVal = 0;
+    
+    for(let i = 0; i < playerHand.length; i++){
+        if(playerHand[i].nameValue != "ace"){
+            console.log(playerHand[i].nameValue)
+            playerVal += playerHand[i].value
         }
-    }else{
-        playerVal += curCards[random].value
     }
-
+    for(let i = 0; i < playerHand.length; i++){
+        if(playerHand[i].nameValue == "ace"){
+            if(playerVal + 11 >= 21){
+                playerVal++;
+            }else{
+                playerVal += 11;
+            }
+        }
+    }
+        
+    console.log("player value addcard " + playerVal)
+    
     let div = document.createElement('div')
     div.setAttribute("id", "card")
     div.setAttribute("style", "position: absolute; width:50px; height: 75px; left:" + playerPosX + "%; bottom: " + playerPosY + "%;")
@@ -325,14 +350,21 @@ function addCardDealer(){
     let random = Math.floor(Math.random()*cardNum)
     dealerHand.push(curCards[random])
 
-    if(curCards[random].value == 0){
-        if(dealerWin + 11 > 21){
-            dealerVal++;
-        }else{
-            dealerVal += 11;
+    dealerVal = 0;
+    
+    for(let i = 0; i < dealerHand.length; i++){
+        if(dealerHand[i].nameValue != "ace"){
+            dealerVal += dealerHand[i].value
         }
-    }else{
-        dealerVal += curCards[random].value
+    }
+    for(let i = 0; i < dealerHand.length; i++){
+        if(dealerHand[i].nameValue == "ace"){
+            if(dealerVal + 11 >= 21){
+                dealerVal++;
+            }else{
+                dealerVal += 11;
+            }
+        }
     }
 
 

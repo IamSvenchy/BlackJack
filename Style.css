@@ -95,12 +95,23 @@
 
 .player-score{
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 20px;
+    left: 46.5%;
+    bottom: 18%;
+    background-color: rgb(170, 167, 167);
+    border-radius: 5%;
+    text-align: center;
+    
 }
 
 .dealer-score{
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 20px;
+    left: 46.5%;
+    bottom: 76%;
+    background-color: rgb(170, 167, 167);
+    border-radius: 5%;
+    text-align: center;
 }
