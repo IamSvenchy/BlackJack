@@ -23,10 +23,12 @@ let dealerWin = false;
 let dealerOpen = false;
 
 const middle = document.querySelector("#middle-container")
+const hitBtn = document.querySelector("#hit")
+const stayBtn = document.querySelector("#stay")
+const splitBtn = document.querySelector("#split")
+const ddBtn = document.querySelector("#dd")
 
-setTimeout(() => {
-    console.log(middle)
-},3000)
+
 //Konstruktor za karte določi suit in vrednost karte ter ime in lokacijo png - ja
 class Card {
     constructor(suit, nameValue) {
@@ -87,7 +89,7 @@ for(let i = 0; i < suits.length; i++){
 
 const divWinLose = document.createElement('div')
 divWinLose.setAttribute("id", "win")
-divWinLose.setAttribute("style", "position: absolute; width:300px; height: 100px; left:" + 32 + "%; bottom: " + 78 + "%; background-color:red")
+divWinLose.setAttribute("style", "position: absolute; width:300px; height: 100px; left:" + 32 + "%; bottom: " + 78 + "%;")
 middle.appendChild(divWinLose)
 
 
@@ -118,15 +120,19 @@ function replay(){
     playerPosY = playerPosStartY
     dealerPosX = PosStartX
     dealerPosY = DealerPosStartY
+    
 
     document.querySelectorAll("#card").forEach((element) => {
         element.remove()
     })
 
     setTimeout(() => {
-        console.log("brisem")
-    deal()}
-        , 2000)
+        hitBtn.disabled = false
+        splitBtn.disabled = true
+        stayBtn.disabled = false
+        ddBtn.disabled = false  
+        deal()}
+        , 1000)
 
 
 }
@@ -138,6 +144,11 @@ let curCards = cards.slice();
 function deal(){
     dealerHand = new Array();
     playerHand = new Array();
+
+    splitBtn.disabled = true
+    hitBtn.disabled = false
+    stayBtn.disabled = false
+    ddBtn.disabled = false
 
 
     for(let i = 0; i < 2; i++){
@@ -151,18 +162,22 @@ function deal(){
     if(playerVal == 21 && dealerVal == 21){
         playerWin = true
         dealerWin = true
-        setTimeout(() => {replay}, 500)
+        setTimeout(() => {replay()}, 1000)
     }
     else if(playerVal == 21){
         playerWin = true;
         playerWins()
         rmvHidden()
-        setTimeout(() => {replay}, 500)
+        
     }else if(dealerVal == 21){
         dealerWin = true
         dealerWins()
         rmvHidden()
-        setTimeout(() => {replay}, 500)
+    
+    }
+
+    if(playerHand[0].value == playerHand[1].value){
+        splitBtn.disabled = false
     }
 
     return curCards;
@@ -171,6 +186,7 @@ function deal(){
 //hit
 function hit(){
     addCardPlayer()
+
     if(playerWin){
         let winSign = document.createElement("img")
         winSign.setAttribute("src", "./Images/winSign.png")
@@ -179,16 +195,15 @@ function hit(){
     }
 
     if(playerVal == 21){
-        playerWins()
         stay()
     }
     if(playerVal > 21){
+        dealerWins()
         rmvHidden()
-        replay()
     }
 }
 function rmvHidden(){
-    if(document.querySelectorAll("#hidden-card") != null){
+    if(document.querySelector("#hidden-card") != null){
         document.querySelector("#hidden-card").remove()
     }
 }
@@ -197,12 +212,31 @@ function rmvHidden(){
 function stay(){
     rmvHidden()
 
+    hitBtn.disabled = true
+    splitBtn.disabled = true
+    ddBtn.disabled = true
+    stayBtn.disabled = true
+
     if(dealerVal <= 16){
-        addCardDealer()
-        setTimeout(() => {stay()}, 500)
-    }else{
-        replay()
+        
+        setTimeout(() => {
+            addCardDealer()
+            stay()}, 1000)
+    }else if(dealerVal > 21){
+        playerWins()
+        console.log("player " + playerVal + " " + "dealer " + dealerVal)
     }
+    else{
+        console.log("player " + playerVal + " " + "dealer " + dealerVal)
+        if(dealerVal > playerVal){
+            dealerWins()
+        }else if(dealerVal < playerVal){
+            playerWins()
+        }else{
+            replay()
+        }
+    }
+    
     /*while(dealerVal <= 16){
         document.querySelector("#hidden-card").remove()
         addCardDealer()
@@ -216,7 +250,18 @@ function split(curCards){
 
 //double down
 function doubleDown(curCards){
+    hitBtn.disabled = true
+    splitBtn.disabled = true
+    ddBtn.disabled = true
+    stayBtn.disabled = true
+
     
+
+    addCardPlayer()
+    if(playerVal > 21){
+        dealerWin = true
+        dealerWins()
+    }else{stay()}
 }
 
 let mainContainer = document.querySelector(".middle-container")
@@ -325,20 +370,30 @@ function addCardDealer(){
     
 }
 
+//money 0:1
 function dealerWins(){
     divWinLose.appendChild(lose)
-    /*setTimeout(() => {
+    setTimeout(() => {
         divWinLose.removeChild(lose)
-        replay(),1000
-    })*/
+        replay()
+    },1500)
 }
-
+//money 2:1
 function playerWins(){
     divWinLose.appendChild(win)
-    /*setTimeout(() => {
+    setTimeout(() => {
         divWinLose.removeChild(win)
-        replay(),1000
-    })*/
+        replay()
+    },1500)
+}
+//money 1:1
+function tie(){
+
 }
 
+//3:1
+function blackJack(){}
+
 deal()
+
+function updateCardVal(){}
