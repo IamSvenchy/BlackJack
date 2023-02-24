@@ -20,6 +20,7 @@ let dealerPosY = DealerPosStartY
 
 let playerWin = false;
 let dealerWin = false;
+let dealerOpen = false;
 
 const middle = document.querySelector("#middle-container")
 
@@ -83,6 +84,53 @@ for(let i = 0; i < suits.length; i++){
 }
 
 
+
+const divWinLose = document.createElement('div')
+divWinLose.setAttribute("id", "win")
+divWinLose.setAttribute("style", "position: absolute; width:300px; height: 100px; left:" + 32 + "%; bottom: " + 78 + "%; background-color:red")
+middle.appendChild(divWinLose)
+
+
+//win sign
+const win = document.createElement('img')
+win.setAttribute("src", "./Images/winSign.png" )
+win.setAttribute("style", "width:100%; height:100%")
+
+//lose sign
+const lose = document.createElement('img')
+lose.setAttribute("src", "./Images/loseSign.png" )
+lose.setAttribute("style", "width:100%; height:100%")
+
+
+
+function replay(){
+    //ponastavi vse parametre
+    playerWin = false;
+    dealerWin = false;
+    dealerOpen = false;
+    curCards = cards.slice()
+    cardNum = 52;
+    dealerHand = new Array()
+    playerHand = new Array()
+    dealerVal = 0
+    playerVal = 0
+    playerPosX = PosStartX
+    playerPosY = playerPosStartY
+    dealerPosX = PosStartX
+    dealerPosY = DealerPosStartY
+
+    document.querySelectorAll("#card").forEach((element) => {
+        element.remove()
+    })
+
+    setTimeout(() => {
+        console.log("brisem")
+    deal()}
+        , 2000)
+
+
+}
+
 //karte trenutno še v kupu
 let curCards = cards.slice();
 
@@ -91,7 +139,6 @@ function deal(){
     dealerHand = new Array();
     playerHand = new Array();
 
-    
 
     for(let i = 0; i < 2; i++){
         addCardDealer()
@@ -101,13 +148,22 @@ function deal(){
     console.log(curCards.length + " ->" + dealerHand + " " + playerHand)
     console.log(playerVal + " " + dealerVal)
 
-    if(playerVal == 21){
+    if(playerVal == 21 && dealerVal == 21){
+        playerWin = true
+        dealerWin = true
+        setTimeout(() => {replay}, 500)
+    }
+    else if(playerVal == 21){
         playerWin = true;
+        playerWins()
+        rmvHidden()
+        setTimeout(() => {replay}, 500)
     }else if(dealerVal == 21){
         dealerWin = true
+        dealerWins()
+        rmvHidden()
+        setTimeout(() => {replay}, 500)
     }
-
-
 
     return curCards;
 }
@@ -121,13 +177,36 @@ function hit(){
         winSign.setAttribute("align", "center")
         middle.appendChild()
     }
+
+    if(playerVal == 21){
+        playerWins()
+        stay()
+    }
+    if(playerVal > 21){
+        rmvHidden()
+        replay()
+    }
+}
+function rmvHidden(){
+    if(document.querySelectorAll("#hidden-card") != null){
+        document.querySelector("#hidden-card").remove()
+    }
 }
 
 //stay
 function stay(){
-    while(dealerVal <= 16){
+    rmvHidden()
+
+    if(dealerVal <= 16){
         addCardDealer()
+        setTimeout(() => {stay()}, 500)
+    }else{
+        replay()
     }
+    /*while(dealerVal <= 16){
+        document.querySelector("#hidden-card").remove()
+        addCardDealer()
+    }*/
 }
 
 //split
@@ -211,6 +290,8 @@ function addCardDealer(){
         dealerVal += curCards[random].value
     }
 
+
+
     let div = document.createElement('div')
     div.setAttribute("id", "card")
     div.setAttribute("style", "position: absolute; width:50px; height: 75px; left:" + dealerPosX + "%; bottom: " + dealerPosY + "%;")
@@ -222,12 +303,42 @@ function addCardDealer(){
     div.appendChild(img)
     middle.appendChild(div)
 
+    if(DealerPosStartY == dealerPosY){
+        let div = document.createElement('div')
+        div.setAttribute("id", "hidden-card")
+        div.setAttribute("style", "position: absolute; width:50px; height: 75px; left:" + dealerPosX + "%; bottom: " + dealerPosY + "%;")
+    
+    
+        let img = document.createElement('img')
+        img.setAttribute("src","./Images/PNG-cards-1.3/backside.png")
+        img.setAttribute("style", "width:100%; height:100%")
+
+        div.appendChild(img)
+        middle.appendChild(div)
+    }
+
     dealerPosX -= 1.2
     dealerPosY -= 2
     
     curCards.splice(random,1)
     cardNum--;
     
+}
+
+function dealerWins(){
+    divWinLose.appendChild(lose)
+    /*setTimeout(() => {
+        divWinLose.removeChild(lose)
+        replay(),1000
+    })*/
+}
+
+function playerWins(){
+    divWinLose.appendChild(win)
+    /*setTimeout(() => {
+        divWinLose.removeChild(win)
+        replay(),1000
+    })*/
 }
 
 deal()
