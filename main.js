@@ -1,6 +1,9 @@
 let suits = ["clubs", "diamonds", "spades", "hearts"]
 let values = ["ace", "2", "3", "4", "5", "6", "7", "8", "9", "10", "jack", "queen", "king"]
 
+let balance = 1000
+const bal = document.getElementById("num")
+bal.innerText = balance + "$"
 //karte
 let dealerHand = new Array();
 let playerHand = new Array();
@@ -368,7 +371,6 @@ function addCardDealer(){
     }
 
 
-
     let div = document.createElement('div')
     div.setAttribute("id", "card")
     div.setAttribute("style", "position: absolute; width:50px; height: 75px; left:" + dealerPosX + "%; bottom: " + dealerPosY + "%;")
@@ -416,6 +418,8 @@ function playerWins(){
     setTimeout(() => {
         divWinLose.removeChild(win)
         replay()
+        balance *= 2
+        bal.innerText = balance + "$"
     },1500)
 }
 //money 1:1
