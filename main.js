@@ -11,6 +11,8 @@ let playerHand = new Array();
 let dealerVal = 0;
 let playerVal = 0;
 
+let bet = 0
+
 const PosStartX = 47.5
 const playerPosStartY = 25
 const DealerPosStartY = 60
@@ -31,6 +33,13 @@ const stayBtn = document.querySelector("#stay")
 const splitBtn = document.querySelector("#split")
 const ddBtn = document.querySelector("#dd")
 
+let betInput = document.querySelector("#betInput")
+let submit = document.querySelector("#submitBet")
+
+hitBtn.disabled = true
+splitBtn.disabled = true
+stayBtn.disabled = true
+ddBtn.disabled = true
 
 //Konstruktor za karte določi suit in vrednost karte ter ime in lokacijo png - ja
 class Card {
@@ -89,12 +98,10 @@ for(let i = 0; i < suits.length; i++){
 }
 
 
-
 const divWinLose = document.createElement('div')
 divWinLose.setAttribute("id", "win")
 divWinLose.setAttribute("style", "position: absolute; width:240px; height: 80px; left:" + 35 + "%; bottom: " + 82 + "%;")
 middle.appendChild(divWinLose)
-
 
 //win sign
 const win = document.createElement('img')
@@ -126,23 +133,11 @@ function replay(){
 
     document.querySelector(".player-score").textContent = ""
     document.querySelector(".dealer-score").textContent = ""
-
-
     
 
     document.querySelectorAll("#card").forEach((element) => {
         element.remove()
     })
-
-    setTimeout(() => {
-        hitBtn.disabled = false
-        splitBtn.disabled = true
-        stayBtn.disabled = false
-        ddBtn.disabled = false  
-        deal()}
-        , 1000)
-
-
 }
 
 //karte trenutno še v kupu
@@ -164,19 +159,14 @@ function deal(){
         addCardPlayer()
     }
 
-    console.log(curCards.length + " ->" + dealerHand + " " + playerHand)
-    console.log(playerVal + " " + dealerVal)
-
-    document.querySelector(".player-score").textContent = playerVal
-
     if(playerVal == 21 && dealerVal == 21){
         playerWin = true
         dealerWin = true
-        setTimeout(() => {replay()}, 1000)
+        setTimeout(() => {tie()}, 1000)
     }
     else if(playerVal == 21){
         playerWin = true;
-        playerWins()
+        blackJack()
         rmvHidden()
         
     }else if(dealerVal == 21){
@@ -196,26 +186,21 @@ function deal(){
 //hit
 function hit(){
     addCardPlayer()
-    document.querySelector(".player-score").textContent = playerVal
-
-    console.log("player val hit " + playerVal)
-
-
-    if(playerWin){
-        let winSign = document.createElement("img")
-        winSign.setAttribute("src", "./Images/winSign.png")
-        winSign.setAttribute("align", "center")
-        middle.appendChild()
-    }
 
     if(playerVal == 21){
         stay()
     }
     if(playerVal > 21){
+        hitBtn.disabled = true
+        splitBtn.disabled = true
+        ddBtn.disabled = true
+        stayBtn.disabled = true
         dealerWins()
         rmvHidden()
     }
 }
+
+//opens hidden card
 function rmvHidden(){
     if(document.querySelector("#hidden-card") != null){
         document.querySelector("#hidden-card").remove()
@@ -226,7 +211,6 @@ function rmvHidden(){
 function stay(){
     rmvHidden()
     document.querySelector(".dealer-score").textContent = dealerVal
-    
 
     hitBtn.disabled = true
     splitBtn.disabled = true
@@ -234,7 +218,6 @@ function stay(){
     stayBtn.disabled = true
 
     if(dealerVal <= 16){
-        
         setTimeout(() => {
             addCardDealer()
             stay()
@@ -242,25 +225,18 @@ function stay(){
         }, 1000)
     }else if(dealerVal > 21){
         playerWins()
-        console.log("player " + playerVal + " " + "dealer " + dealerVal)
     }
     else{
-        console.log("player " + playerVal + " " + "dealer " + dealerVal)
         if(dealerVal > playerVal){
             dealerWins()
         }else if(dealerVal < playerVal){
             playerWins()
         }else{
-            replay()
+            tie()
         }
     }
-    
-    /*while(dealerVal <= 16){
-        document.querySelector("#hidden-card").remove()
-        addCardDealer()
-    }*/
 }
-
+//TODO
 //split
 function split(curCards){
     
@@ -273,13 +249,17 @@ function doubleDown(curCards){
     ddBtn.disabled = true
     stayBtn.disabled = true
 
-    
+    balance -= bet    
+    bet *= 2
 
     addCardPlayer()
+    
     if(playerVal > 21){
         dealerWin = true
+        rmvHidden()
         dealerWins()
-    }else{stay()}
+    }else setTimeout(()=>{stay()}, 1000)
+
 }
 
 let mainContainer = document.querySelector(".middle-container")
@@ -326,8 +306,6 @@ function addCardPlayer(){
             }
         }
     }
-        
-    console.log("player value addcard " + playerVal)
     
     let div = document.createElement('div')
     div.setAttribute("id", "card")
@@ -346,6 +324,8 @@ function addCardPlayer(){
 
     curCards.splice(random,1)
     cardNum--;
+
+    document.querySelector(".player-score").textContent = playerVal
 }
 
 function addCardDealer(){
@@ -362,7 +342,7 @@ function addCardDealer(){
     }
     for(let i = 0; i < dealerHand.length; i++){
         if(dealerHand[i].nameValue == "ace"){
-            if(dealerVal + 11 >= 21){
+            if(dealerVal + 11 > 21){
                 dealerVal++;
             }else{
                 dealerVal += 11;
@@ -404,6 +384,7 @@ function addCardDealer(){
     
 }
 
+
 //money 0:1
 function dealerWins(){
     divWinLose.appendChild(lose)
@@ -411,25 +392,66 @@ function dealerWins(){
         divWinLose.removeChild(lose)
         replay()
     },1500)
+
+    betInput.disabled = false
+    submit.disabled = false
 }
+
+
 //money 2:1
 function playerWins(){
     divWinLose.appendChild(win)
     setTimeout(() => {
         divWinLose.removeChild(win)
-        replay()
-        balance *= 2
+        balance += bet * 2
         bal.innerText = balance + "$"
+        replay()
     },1500)
+
+    betInput.disabled = false
+    submit.disabled = false
 }
 //money 1:1
 function tie(){
+    replay()
+    balance += bet
+    bal.innerHTML = balance + "$"
 
+    betInput.disabled = false
+    submit.disabled = false
 }
 
 //3:1
-function blackJack(){}
+function blackJack(){
+    if(dealerVal == 21){
+        tie()
+    }else{
+        divWinLose.appendChild(win)
+        setTimeout(() => {
+            divWinLose.removeChild(win)
+            balance += bet * 3
+            bal.innerText = balance + "$"
+            replay()
+        },1500)
 
-deal()
+        betInput.disabled = false
+        submit.disabled = false
+    }
+}
 
-function updateCardVal(){}
+function acceptBet(){
+    balance -= betInput.value
+    bet = betInput.value
+    bal.innerText = balance + "$"
+    betInput.value = ""
+
+    betInput.disabled = true
+    submit.disabled = true
+
+    hitBtn.disabled = false
+    splitBtn.disabled = true
+    stayBtn.disabled = false
+    ddBtn.disabled = false
+
+    deal()
+}

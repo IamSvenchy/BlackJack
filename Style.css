@@ -124,3 +124,22 @@
     top: 15px;
     background-color: wheat;
 }
+
+#betInput{
+    position: absolute;
+    top: 80px;
+    left: 67px;
+    width: 100px;
+    border-radius: 10%;
+    border-color: grey;
+    
+}
+
+#submitBet{
+    position: absolute;
+    top: 80px;
+    left: 170px;
+    border-radius: 10%;
+    border-width: 2px;
+    border-color: grey;
+}
